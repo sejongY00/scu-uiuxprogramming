@@ -278,3 +278,38 @@ input[type="email"]:focus {
     min-height: 48px;
   }
 }
+
+/* 5주차: 제보 처리 결과 안내 문구와 버튼 상태 */
+.report-message {
+  max-width: 570px;
+  min-height: 1.6em;
+  margin: 14px 0 0;
+  color: #5e6272;
+  font-weight: 700;
+}
+
+/* 이메일이 잘못되었을 때 */
+.report-message.is-error {
+  color: #b3261e;
+}
+
+input[type="email"].is-error {
+  border-color: #b3261e;
+  background-color: #fff6f5;
+}
+
+/* JavaScript가 is-success를 추가하면 접수 완료 상태가 보입니다. */
+.report-message.is-success {
+  padding: 12px;
+  border-radius: 10px;
+  color: #245c3a;
+  background-color: #e7f7ed;
+}
+
+/* 접수 뒤 버튼을 비활성화합니다. */
+.primary-button:disabled {
+  color: #ffffff;
+  background-color: #a8a8b2;
+  cursor: not-allowed;
+  transform: none;
+}

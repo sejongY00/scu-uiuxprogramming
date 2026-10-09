@@ -76,7 +76,7 @@
 
     <section id="report" class="content-section report-section">
       <h2>분실·습득 제보</h2>
-      <form class="report-form">
+      <form class="report-form" novalidate>
         <label class="email-field" for="email">
           이메일
           <input
@@ -84,16 +84,21 @@
             id="email"
             name="email"
             placeholder="name@example.com"
+            autocomplete="email"
+            aria-describedby="reportMessage"
           >
         </label>
-        <button class="primary-button" type="submit">제보 보내기</button>
+        <button class="primary-button" id="reportButton" type="submit">제보 보내기</button>
       </form>
+      <p class="report-message" id="reportMessage" role="status" aria-live="polite">연락받을 이메일을 입력하고 제보를 보내 주세요.</p>
     </section>
   </main>
 
   <footer class="site-footer">
     <p>© 2026 캠퍼스 분실물</p>
   </footer>
+
+  <script src="script.js"></script>
 </body>
 
 </html>
