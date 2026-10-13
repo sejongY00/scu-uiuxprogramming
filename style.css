@@ -118,28 +118,61 @@ h3 {
   border-radius: 14px;
 }
 
-/* 주요 기능: 같은 그룹의 카드를 화면 너비에 맞게 자동으로 배치 */
-.feature-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  align-items: stretch;
-  gap: 24px;
+/* 주요 기능: 탭 버튼과 선택된 패널 하나만 표시 */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
-.feature-card {
-  min-width: 0;
+.tab {
+  padding: 10px 16px;
+  border: 1px solid #d7d4f6;
+  border-radius: 8px;
+  color: #5e6272;
+  font: inherit;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.tab:hover {
+  color: #4038a5;
+  background-color: #ebe9ff;
+}
+
+.tab:focus {
+  outline: 3px solid #b9b4ef;
+  outline-offset: 3px;
+}
+
+.tab.is-active {
+  color: #5b50c8;
+  border-color: #5b50c8;
+  border-bottom: 4px solid currentColor;
+  font-weight: 700;
+  background-color: #ffffff;
+}
+
+.panel {
   padding: 24px;
   border: 1px solid #d7d4f6;
   border-radius: 14px;
   background-color: #f4f3ff;
 }
 
-.feature-card p {
-  margin-bottom: 0;
+.panel[hidden] {
+  display: none;
+}
+
+.panel p {
   color: #5e6272;
+}
+
+.panel-list {
+  margin: 0;
+  padding-left: 24px;
 }
 
 /* 이용 방법: 순서와 항목 간 간격 유지 */
@@ -159,18 +192,24 @@ h3 {
 
 .report-form {
   display: flex;
-  align-items: flex-end;
-  gap: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
   max-width: 570px;
 }
 
-.email-field {
-  flex: 1;
-  margin: 0;
+.form-field {
+  width: 100%;
+}
+
+.form-field label {
+  display: block;
   font-weight: 700;
 }
 
-input[type="email"] {
+.form-field select,
+input[type="email"],
+input[type="text"] {
   display: block;
   width: 100%;
   margin-top: 8px;
@@ -180,6 +219,12 @@ input[type="email"] {
   font: inherit;
 }
 
+.form-field select {
+  background-color: #ffffff;
+}
+
+.form-field select:focus,
+input[type="text"]:focus,
 input[type="email"]:focus {
   border-color: #5b50c8;
   outline: 3px solid #d9d6ff;
@@ -258,18 +303,26 @@ input[type="email"]:focus {
     padding: 8px 0;
   }
 
-  /* Grid 카드 목록을 한 열로 고정 */
-  .feature-list {
-    grid-template-columns: 1fr;
-  }
-
-  /* 이메일 입력창과 버튼을 한 열로 배치 */
-  .report-form {
+  /* 탭을 위에서 아래로 배치 */
+  .tabs {
     flex-direction: column;
     align-items: stretch;
   }
 
-  input[type="email"],
+  .tab {
+    width: 100%;
+    text-align: left;
+  }
+
+  .panel {
+    padding: 20px;
+  }
+
+  /* 제보 폼의 입력창과 버튼을 화면 너비에 맞춤 */
+  .report-form {
+    align-items: stretch;
+  }
+
   .primary-button {
     width: 100%;
   }
@@ -312,4 +365,137 @@ input[type="email"].is-error {
   background-color: #a8a8b2;
   cursor: not-allowed;
   transform: none;
+}
+
+/* 6주차: 글자 수 안내, 제보 종류별 버튼 색, 테마 버튼 */
+.field-count {
+  margin: 6px 0 0;
+  color: #747786;
+  font-size: 14px;
+  text-align: right;
+}
+
+/* 글자 수가 한도에 가까워지면 */
+.field-count.is-near-limit {
+  color: #b3261e;
+  font-weight: 700;
+}
+
+input[type="text"].is-error {
+  border-color: #b3261e;
+  background-color: #fff6f5;
+}
+
+/* 습득 등록을 고르면 버튼 색이 바뀝니다. */
+.primary-button.is-found {
+  background-color: #1f7a4d;
+}
+
+.primary-button.is-found:hover {
+  background-color: #17603c;
+}
+
+.primary-button:disabled,
+.primary-button.is-found:disabled {
+  background-color: #a8a8b2;
+}
+
+.theme-button {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid #bfc1d1;
+  border-radius: 8px;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.theme-button:hover {
+  background-color: #ebe9ff;
+}
+
+.theme-button:focus {
+  outline: 3px solid #b9b4ef;
+  outline-offset: 3px;
+}
+
+/* 어두운 테마: body에 dark 클래스가 있을 때 */
+body.dark {
+  color: #f4f4f8;
+  background-color: #20212a;
+}
+
+body.dark .eyebrow {
+  color: #b9b4ef;
+}
+
+body.dark .header-description,
+body.dark .panel p,
+body.dark .report-message,
+body.dark .field-count {
+  color: #d8d8e2;
+}
+
+body.dark .site-nav a:hover {
+  color: #ffffff;
+  background-color: #3a3b4a;
+}
+
+body.dark .content-section,
+body.dark .report-section {
+  border-color: #50515f;
+  background-color: #2d2e38;
+}
+
+body.dark .panel {
+  border-color: #50515f;
+  background-color: #383947;
+}
+
+body.dark .tab,
+body.dark .theme-button {
+  color: #f4f4f8;
+  border-color: #50515f;
+  background-color: #2d2e38;
+}
+
+body.dark .tab:hover,
+body.dark .theme-button:hover {
+  background-color: #3a3b4a;
+}
+
+body.dark .tab.is-active {
+  color: #c9c5ff;
+  border-color: #c9c5ff;
+  background-color: #383947;
+}
+
+body.dark input[type="email"],
+body.dark input[type="text"],
+body.dark .form-field select {
+  color: #f4f4f8;
+  border-color: #6a6b7c;
+  background-color: #20212a;
+}
+
+body.dark input[type="email"].is-error,
+body.dark input[type="text"].is-error {
+  border-color: #ff8a80;
+  background-color: #3a2a2c;
+}
+
+body.dark .report-message.is-error,
+body.dark .field-count.is-near-limit {
+  color: #ff8a80;
+}
+
+body.dark .report-message.is-success {
+  color: #c7f0d4;
+  background-color: #1f4a30;
+}
+
+body.dark .site-footer {
+  color: #b5b7c4;
 }

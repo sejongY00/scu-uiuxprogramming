@@ -27,6 +27,8 @@
       <a href="#steps">이용 방법</a>
       <a href="#report">분실·습득 제보</a>
     </nav>
+
+    <button class="theme-button" id="themeButton" type="button" aria-pressed="false">어두운 테마로 바꾸기</button>
   </header>
 
   <main>
@@ -49,20 +51,54 @@
 
     <section id="features" class="content-section">
       <h2>주요 기능</h2>
-      <ul class="feature-list">
-        <li class="feature-card">
-          <h3>분실 제보</h3>
-          <p>잃어버린 물건의 특징과 마지막으로 본 장소를 적어 둡니다.</p>
-        </li>
-        <li class="feature-card">
-          <h3>습득 등록</h3>
-          <p>주운 물건의 특징과 장소를 등록해 주인을 찾아줍니다.</p>
-        </li>
-        <li class="feature-card">
-          <h3>건물별 모아보기</h3>
-          <p>도서관, 학생회관처럼 건물별로 제보를 모아 봅니다.</p>
-        </li>
-      </ul>
+
+      <div class="tabs" role="tablist" aria-label="주요 기능 선택">
+        <button id="tab-lost" class="tab is-active" type="button"
+          role="tab" aria-selected="true"
+          aria-controls="panel-lost" data-target="#panel-lost">
+          분실 제보
+        </button>
+        <button id="tab-found" class="tab" type="button"
+          role="tab" aria-selected="false"
+          aria-controls="panel-found" data-target="#panel-found">
+          습득 등록
+        </button>
+        <button id="tab-building" class="tab" type="button"
+          role="tab" aria-selected="false"
+          aria-controls="panel-building" data-target="#panel-building">
+          건물별 모아보기
+        </button>
+      </div>
+
+      <div id="panel-lost" class="panel is-active" role="tabpanel" aria-labelledby="tab-lost">
+        <h3>잃어버린 물건을 알려 주세요</h3>
+        <p>물건의 특징과 마지막으로 본 장소를 적어 두면, 같은 물건을 주운 사람이 등록했을 때 바로 연락받을 수 있습니다.</p>
+        <ul class="panel-list">
+          <li>물건 종류와 색, 크기 같은 특징</li>
+          <li>마지막으로 본 건물과 장소</li>
+          <li>연락받을 이메일</li>
+        </ul>
+      </div>
+
+      <div id="panel-found" class="panel" role="tabpanel" aria-labelledby="tab-found" hidden>
+        <h3>주운 물건을 등록해 주세요</h3>
+        <p>주운 물건의 특징과 발견한 장소를 등록하면 주인이 확인하고 찾아갈 수 있습니다. 보관 중인 장소도 함께 적어 주세요.</p>
+        <ul class="panel-list">
+          <li>물건 종류와 겉으로 보이는 특징</li>
+          <li>발견한 건물과 장소</li>
+          <li>지금 물건을 맡겨 둔 곳</li>
+        </ul>
+      </div>
+
+      <div id="panel-building" class="panel" role="tabpanel" aria-labelledby="tab-building" hidden>
+        <h3>건물별로 모아 봅니다</h3>
+        <p>도서관, 학생회관처럼 건물별로 제보를 모아 보여 주어, 자주 가는 건물의 분실물만 빠르게 확인할 수 있습니다.</p>
+        <ul class="panel-list">
+          <li>도서관: 학생증, 노트북 충전기</li>
+          <li>학생회관: 텀블러, 우산</li>
+          <li>공학관: 계산기, 이어폰</li>
+        </ul>
+      </div>
     </section>
 
     <section id="steps" class="content-section">
@@ -77,8 +113,29 @@
     <section id="report" class="content-section report-section">
       <h2>분실·습득 제보</h2>
       <form class="report-form" novalidate>
-        <label class="email-field" for="email">
-          이메일
+        <div class="form-field">
+          <label for="reportType">제보 종류</label>
+          <select id="reportType" name="reportType">
+            <option value="lost">물건을 잃어버렸어요</option>
+            <option value="found">물건을 주웠어요</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="itemInfo">물건 특징</label>
+          <input
+            type="text"
+            id="itemInfo"
+            name="itemInfo"
+            maxlength="30"
+            placeholder="예: 검은색 에어팟 케이스"
+            aria-describedby="itemInfoCount"
+          >
+          <p class="field-count" id="itemInfoCount" aria-live="polite">0 / 30</p>
+        </div>
+
+        <div class="form-field">
+          <label for="email">이메일</label>
           <input
             type="email"
             id="email"
@@ -87,10 +144,11 @@
             autocomplete="email"
             aria-describedby="reportMessage"
           >
-        </label>
-        <button class="primary-button" id="reportButton" type="submit">제보 보내기</button>
+        </div>
+
+        <button class="primary-button" id="reportButton" type="submit">분실 제보 보내기</button>
       </form>
-      <p class="report-message" id="reportMessage" role="status" aria-live="polite">연락받을 이메일을 입력하고 제보를 보내 주세요.</p>
+      <p class="report-message" id="reportMessage" role="status" aria-live="polite">잃어버린 물건의 특징과 연락받을 이메일을 입력해 주세요.</p>
     </section>
   </main>
 
