@@ -1,6 +1,7 @@
 // 5주차: 분실·습득 제보 — 이메일을 확인하고 처리 결과를 화면에 알려 줍니다.
 // 6주차: click(테마·제보 보내기)·input(글자 수)·change(제보 종류) 이벤트와 기능 탭을 추가합니다.
 // 7주차: 물건 정보 → 장소·연락 → 확인 → 완료로 이어지는 단계별 제보 흐름을 추가합니다.
+// 중간고사: 완료된 제보를 '내 제보 목록'에 쌓아 다시 보거나 취소할 수 있게 합니다.
 console.log("JavaScript가 연결되었습니다.");
 
 // 1. 변하지 않는 값은 const로 저장합니다.
@@ -459,7 +460,7 @@ function handleSummaryEdit(event) {
   }
 }
 
-// 28. 완료 버튼: 다시 한 번 검사한 뒤 접수번호와 완료 화면을 보여 줍니다.
+// 28. 완료 버튼: 다시 한 번 검사한 뒤 접수번호와 완료 화면을 보여 주고, 내 제보 목록에 더합니다.
 function handleFlowSubmit() {
   for (let step = 1; step <= 2; step = step + 1) {
     const problems = checkFlowStep(step);
@@ -474,10 +475,29 @@ function handleFlowSubmit() {
   const values = getFlowValues();
 
   reportCount = reportCount + 1;
+  const reportId = "LF-" + String(reportCount).padStart(3, "0");
+
   flowDoneMessage.textContent =
-    "접수번호 LF-" + String(reportCount).padStart(3, "0") + " · " +
+    "접수번호 " + reportId + " · " +
     makeReportMessage(reportTypes[values.type].label, values.email, reportCount);
   fillSummary(flowDoneSummary, false);
+
+  myReports.unshift({
+    id: reportId,
+    type: values.type,
+    typeLabel: reportTypes[values.type].label,
+    category: values.category,
+    item: values.item,
+    building: values.building,
+    place: values.place,
+    dateLabel: flowDateLabels[values.type],
+    date: values.date,
+    keep: values.keep,
+    email: values.email,
+    status: "active"
+  });
+  renderMyReportsList();
+
   showFlowStep(4);
 }
 
@@ -544,3 +564,129 @@ document.querySelectorAll(".flow-back").forEach(function (button) {
 document.querySelector("#flowSubmit").addEventListener("click", handleFlowSubmit);
 document.querySelector("#flowRestart").addEventListener("click", handleFlowRestart);
 document.querySelector("#flowRestartTop").addEventListener("click", handleFlowRestart);
+
+// ---------- 중간고사: 내 제보 목록 ----------
+
+// 33. 완료된 제보를 쌓아 두는 목록입니다. 단계별 제보를 완료할 때마다 맨 앞에 추가됩니다.
+let myReports = [];
+
+const myReportsEmpty = document.querySelector("#myReportsEmpty");
+const myReportsList = document.querySelector("#myReportsList");
+
+// 34. 제보 하나를 카드(li)로 만듭니다. 상태에 따라 취소 버튼 대신 안내 문구를 넣습니다.
+function createReportCard(report) {
+  const item = document.createElement("li");
+
+  item.className = "report-card";
+  item.classList.toggle("is-cancelled", report.status === "cancelled");
+  item.dataset.reportId = report.id;
+
+  const summary = document.createElement("div");
+  const badge = document.createElement("span");
+  const idText = document.createElement("strong");
+  const title = document.createElement("p");
+  const meta = document.createElement("p");
+
+  badge.className = "report-status";
+  badge.textContent = report.status === "cancelled" ? "취소됨" : "접수됨";
+  idText.textContent = report.id;
+  title.className = "report-title";
+  title.textContent = report.typeLabel + " · " + report.category + " · " + report.item;
+  meta.className = "report-meta";
+  meta.textContent = report.building + " · " + report.dateLabel + " " + report.date;
+  summary.append(badge, idText, title, meta);
+
+  const detail = document.createElement("dl");
+  const detailRows = [
+    { label: "상세 장소", value: report.place === "" ? "입력하지 않음" : report.place }
+  ];
+
+  detail.className = "summary-list report-detail";
+  detail.hidden = true;
+  if (report.type === "found") {
+    detailRows.push({ label: "맡겨 둔 곳", value: report.keep });
+  }
+  detailRows.push({ label: "이메일", value: report.email });
+  detailRows.forEach(function (row) {
+    const wrapper = document.createElement("div");
+    const term = document.createElement("dt");
+    const description = document.createElement("dd");
+
+    term.textContent = row.label;
+    description.textContent = row.value;
+    wrapper.append(term, description);
+    detail.append(wrapper);
+  });
+
+  const actions = document.createElement("div");
+  const toggleButton = document.createElement("button");
+
+  actions.className = "report-actions";
+  toggleButton.type = "button";
+  toggleButton.className = "text-button report-toggle";
+  toggleButton.textContent = "자세히 보기";
+  actions.append(toggleButton);
+
+  if (report.status === "active") {
+    const cancelButton = document.createElement("button");
+
+    cancelButton.type = "button";
+    cancelButton.className = "secondary-button report-cancel";
+    cancelButton.textContent = "찾았어요 (제보 취소)";
+    actions.append(cancelButton);
+  } else {
+    const cancelledNote = document.createElement("p");
+
+    cancelledNote.className = "report-cancelled-note";
+    cancelledNote.textContent = "이 제보는 취소되었어요.";
+    actions.append(cancelledNote);
+  }
+
+  item.append(summary, detail, actions);
+  return item;
+}
+
+// 35. 목록을 다시 그립니다. 제보가 없으면 빈 상태 문구만 보여 줍니다.
+function renderMyReportsList() {
+  myReportsList.textContent = "";
+
+  if (myReports.length === 0) {
+    myReportsEmpty.hidden = false;
+    myReportsList.hidden = true;
+    return;
+  }
+
+  myReportsEmpty.hidden = true;
+  myReportsList.hidden = false;
+  myReports.forEach(function (report) {
+    myReportsList.append(createReportCard(report));
+  });
+}
+
+// 36. 카드의 '자세히 보기'는 상세 내용을 펼치고 접습니다. '찾았어요'는 그 제보만 취소 상태로 바꿉니다.
+function handleMyReportsListClick(event) {
+  const toggleButton = event.target.closest(".report-toggle");
+
+  if (toggleButton !== null) {
+    const detail = toggleButton.closest(".report-card").querySelector(".report-detail");
+
+    detail.hidden = !detail.hidden;
+    toggleButton.textContent = detail.hidden ? "자세히 보기" : "접기";
+    return;
+  }
+
+  const cancelButton = event.target.closest(".report-cancel");
+
+  if (cancelButton !== null) {
+    const reportId = cancelButton.closest(".report-card").dataset.reportId;
+    const report = myReports.find(function (item) {
+      return item.id === reportId;
+    });
+
+    report.status = "cancelled";
+    renderMyReportsList();
+  }
+}
+
+// 37. 이벤트와 함수를 연결합니다.
+myReportsList.addEventListener("click", handleMyReportsListClick);

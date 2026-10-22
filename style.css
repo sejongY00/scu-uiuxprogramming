@@ -926,3 +926,127 @@ body.dark .done-message {
 body.dark .done-message {
   background-color: #1f4a30;
 }
+
+/* 중간고사: 내 제보 목록 */
+.my-reports-empty {
+  max-width: 570px;
+  color: #5e6272;
+}
+
+.my-reports-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.my-reports-list[hidden] {
+  display: none;
+}
+
+.report-card {
+  padding: 20px;
+  border: 1px solid #d7d4f6;
+  border-radius: 14px;
+  background-color: #f4f3ff;
+}
+
+.report-status {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: #245c3a;
+  font-size: 13px;
+  font-weight: 700;
+  background-color: #e7f7ed;
+}
+
+.report-card.is-cancelled .report-status {
+  color: #5e6272;
+  background-color: #e6e6ef;
+}
+
+.report-card > div > strong {
+  margin-left: 8px;
+  color: #5b50c8;
+}
+
+.report-title {
+  margin: 10px 0 4px;
+  font-weight: 700;
+}
+
+.report-meta {
+  margin: 0;
+  color: #5e6272;
+  font-size: 14px;
+}
+
+.report-detail {
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
+.report-detail[hidden] {
+  display: none;
+}
+
+.report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.report-cancelled-note {
+  margin: 0;
+  color: #5e6272;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.report-card.is-cancelled {
+  opacity: 0.75;
+}
+
+@media (max-width: 768px) {
+  .report-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .report-actions .secondary-button {
+    width: 100%;
+    min-height: 48px;
+  }
+}
+
+/* 어두운 테마: 내 제보 목록 */
+body.dark .my-reports-empty,
+body.dark .report-meta,
+body.dark .report-cancelled-note {
+  color: #d8d8e2;
+}
+
+body.dark .report-card {
+  border-color: #50515f;
+  background-color: #383947;
+}
+
+body.dark .report-status {
+  color: #c7f0d4;
+  background-color: #1f4a30;
+}
+
+body.dark .report-card.is-cancelled .report-status {
+  color: #d8d8e2;
+  background-color: #3a3b4a;
+}
+
+body.dark .report-card > div > strong {
+  color: #c9c5ff;
+}
