@@ -12,8 +12,9 @@
   <!--
   사용자: 교내에서 물건을 잃어버리거나 주운 학생·교직원
   목적: 분실물 제보 방법과 찾아가는 과정을 이해한다
-  핵심 행동: 필요한 안내 영역으로 이동하고, 이메일로 분실·습득 제보를 남긴다
-  정보 순서: 서비스 소개 → 주요 기능 → 이용 방법 → 분실·습득 제보
+  핵심 행동: 필요한 안내 영역으로 이동하고, 단계별로 분실·습득 제보를 완료한다
+  완료 조건: 제보 내용 확인 화면에서 제보를 완료해 접수번호 화면에 도달한다
+  정보 순서: 서비스 소개 → 주요 기능 → 이용 방법 → 단계별 제보 → 빠른 제보
   -->
 
   <header class="site-header">
@@ -25,6 +26,7 @@
       <a href="#about">서비스 소개</a>
       <a href="#features">주요 기능</a>
       <a href="#steps">이용 방법</a>
+      <a href="#flow">단계별 제보</a>
       <a href="#report">분실·습득 제보</a>
     </nav>
 
@@ -105,9 +107,143 @@
       <h2>이용 방법</h2>
       <ol class="steps-list">
         <li>서비스 소개를 읽고 이용 방법을 파악합니다.</li>
-        <li>분실인지 습득인지 선택하고 장소와 특징을 입력합니다.</li>
-        <li>연락받을 이메일을 남기고 제보를 제출합니다.</li>
+        <li>‘단계별 제보’에서 분실인지 습득인지 선택하고 물건·장소·연락처를 입력합니다.</li>
+        <li>입력한 내용을 확인하고 제보를 완료합니다. 이메일만 남기는 빠른 제보도 쓸 수 있습니다.</li>
       </ol>
+    </section>
+
+    <section id="flow" class="content-section flow-section">
+      <h2>단계별 제보하기</h2>
+      <p class="flow-intro">물건 정보 → 장소·연락 → 확인 → 완료 순서로 제보를 마칩니다. 중간에 돌아가 고쳐도 입력한 값은 그대로 남아 있습니다.</p>
+      <button class="primary-button" id="flowStart" type="button">제보 시작하기</button>
+
+      <div class="flow-panel" id="flowPanel" hidden>
+        <div class="flow-head">
+          <p class="flow-progress" id="flowProgress" role="status" aria-live="polite">1 / 3 · 물건 정보</p>
+          <button class="text-button" id="flowRestartTop" type="button">처음부터 다시 시작</button>
+        </div>
+
+        <ol class="flow-steps" aria-label="제보 진행 단계">
+          <li class="is-current" aria-current="step">물건 정보</li>
+          <li>장소·연락</li>
+          <li>확인</li>
+          <li>완료</li>
+        </ol>
+
+        <form id="flowForm" novalidate>
+          <section class="flow-step" data-step="1">
+            <h3 tabindex="-1">물건 정보</h3>
+
+            <div class="flow-field">
+              <fieldset class="choice-group" id="flowTypeGroup" aria-describedby="flowTypeError">
+                <legend>제보 종류 <span class="required">(필수)</span></legend>
+                <label class="choice"><input type="radio" name="flowType" value="lost"> 물건을 잃어버렸어요</label>
+                <label class="choice"><input type="radio" name="flowType" value="found"> 물건을 주웠어요</label>
+              </fieldset>
+              <p class="field-error" id="flowTypeError" role="alert"></p>
+            </div>
+
+            <div class="flow-field">
+              <label for="flowCategory">물건 분류 <span class="required">(필수)</span></label>
+              <select id="flowCategory" name="flowCategory" aria-describedby="flowCategoryError">
+                <option value="">분류를 골라 주세요</option>
+                <option value="지갑·카드">지갑·카드</option>
+                <option value="학생증">학생증</option>
+                <option value="전자기기">전자기기</option>
+                <option value="우산·텀블러">우산·텀블러</option>
+                <option value="의류·가방">의류·가방</option>
+                <option value="기타">기타</option>
+              </select>
+              <p class="field-error" id="flowCategoryError" role="alert"></p>
+            </div>
+
+            <div class="flow-field">
+              <label for="flowItem">물건 특징 <span class="required">(필수)</span></label>
+              <input type="text" id="flowItem" name="flowItem" maxlength="30"
+                placeholder="예: 검은색 에어팟 케이스" aria-describedby="flowItemCount flowItemError">
+              <p class="field-count" id="flowItemCount">0 / 30</p>
+              <p class="field-error" id="flowItemError" role="alert"></p>
+            </div>
+
+            <p class="step-error" id="flowStepError1" role="alert"></p>
+            <div class="flow-actions">
+              <button class="primary-button flow-next" type="button" data-step="1">장소·연락 입력하기</button>
+            </div>
+          </section>
+
+          <section class="flow-step" data-step="2" hidden>
+            <h3 tabindex="-1">장소와 연락처</h3>
+
+            <div class="flow-field">
+              <label for="flowBuilding">건물 <span class="required">(필수)</span></label>
+              <select id="flowBuilding" name="flowBuilding" aria-describedby="flowBuildingError">
+                <option value="">건물을 골라 주세요</option>
+                <option value="도서관">도서관</option>
+                <option value="학생회관">학생회관</option>
+                <option value="공학관">공학관</option>
+                <option value="기숙사">기숙사</option>
+                <option value="그 밖의 건물">그 밖의 건물</option>
+              </select>
+              <p class="field-error" id="flowBuildingError" role="alert"></p>
+            </div>
+
+            <div class="flow-field">
+              <label for="flowPlace">상세 장소 (선택)</label>
+              <input type="text" id="flowPlace" name="flowPlace" maxlength="30" placeholder="예: 2층 열람실 창가 자리">
+            </div>
+
+            <div class="flow-field">
+              <label for="flowDate" id="flowDateLabel">날짜 <span class="required">(필수)</span></label>
+              <input type="date" id="flowDate" name="flowDate" aria-describedby="flowDateError">
+              <p class="field-error" id="flowDateError" role="alert"></p>
+            </div>
+
+            <div class="flow-field" id="flowKeepField" hidden>
+              <label for="flowKeep">지금 물건을 맡겨 둔 곳 <span class="required">(필수)</span></label>
+              <select id="flowKeep" name="flowKeep" aria-describedby="flowKeepHelp flowKeepError">
+                <option value="">보관 장소를 골라 주세요</option>
+                <option value="내가 가지고 있어요">내가 가지고 있어요</option>
+                <option value="학생회관 분실물 보관함">학생회관 분실물 보관함</option>
+                <option value="경비실">경비실</option>
+              </select>
+              <p class="field-help" id="flowKeepHelp">주운 물건은 주인이 찾아갈 수 있도록 보관 장소를 함께 알려 주세요.</p>
+              <p class="field-error" id="flowKeepError" role="alert"></p>
+            </div>
+
+            <div class="flow-field">
+              <label for="flowEmail">연락받을 이메일 <span class="required">(필수)</span></label>
+              <input type="email" id="flowEmail" name="flowEmail" placeholder="name@example.com"
+                autocomplete="email" aria-describedby="flowEmailError">
+              <p class="field-error" id="flowEmailError" role="alert"></p>
+            </div>
+
+            <p class="step-error" id="flowStepError2" role="alert"></p>
+            <div class="flow-actions">
+              <button class="secondary-button flow-back" type="button" data-step="2">물건 정보 수정하기</button>
+              <button class="primary-button flow-next" type="button" data-step="2">제보 내용 확인하기</button>
+            </div>
+          </section>
+
+          <section class="flow-step" data-step="3" hidden>
+            <h3 tabindex="-1">제보 내용 확인</h3>
+            <p class="flow-help">내용이 맞는지 확인하세요. 틀린 항목은 ‘수정’을 눌러 고칠 수 있고, 고친 값은 이 화면에 바로 반영됩니다.</p>
+            <dl class="summary-list" id="flowSummary"></dl>
+            <div class="flow-actions">
+              <button class="secondary-button flow-back" type="button" data-step="3">장소·연락 수정하기</button>
+              <button class="primary-button" id="flowSubmit" type="button">제보 완료하기</button>
+            </div>
+          </section>
+
+          <section class="flow-step" data-step="4" hidden>
+            <h3 tabindex="-1">제보가 완료되었습니다</h3>
+            <p class="done-message" id="flowDoneMessage"></p>
+            <dl class="summary-list" id="flowDoneSummary"></dl>
+            <div class="flow-actions">
+              <button class="primary-button" id="flowRestart" type="button">새 제보 작성하기</button>
+            </div>
+          </section>
+        </form>
+      </div>
     </section>
 
     <section id="report" class="content-section report-section">

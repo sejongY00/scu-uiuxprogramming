@@ -499,3 +499,430 @@ body.dark .report-message.is-success {
 body.dark .site-footer {
   color: #b5b7c4;
 }
+
+/* 7주차: 단계별 제보 흐름 */
+.flow-intro {
+  max-width: 570px;
+  color: #5e6272;
+}
+
+.flow-panel {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid #d7d4f6;
+  border-radius: 14px;
+  background-color: #f4f3ff;
+}
+
+.flow-panel[hidden],
+.flow-step[hidden],
+.flow-field[hidden],
+#flowStart[hidden] {
+  display: none;
+}
+
+.flow-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.flow-progress {
+  margin: 0;
+  color: #5b50c8;
+  font-weight: 700;
+}
+
+/* 진행 단계 표시: 현재 단계는 보라색, 지나온 단계는 초록색 */
+.flow-steps {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.flow-steps li {
+  flex: 1;
+  padding: 8px 4px;
+  border-bottom: 4px solid #d7d4f6;
+  color: #747786;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.flow-steps li.is-current {
+  color: #5b50c8;
+  border-color: #5b50c8;
+}
+
+.flow-steps li.is-done {
+  color: #245c3a;
+  border-color: #1f7a4d;
+}
+
+.flow-step {
+  max-width: 570px;
+}
+
+.flow-step h3:focus {
+  outline: none;
+}
+
+.flow-field {
+  margin-bottom: 16px;
+}
+
+.flow-field label,
+.choice-group legend {
+  display: block;
+  padding: 0;
+  font-weight: 700;
+}
+
+.flow-field select,
+.flow-field input[type="date"],
+.flow-field input[type="email"],
+.flow-field input[type="text"] {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin-top: 8px;
+  padding: 12px 14px;
+  border: 1px solid #bfc1d1;
+  border-radius: 8px;
+  color: inherit;
+  font: inherit;
+  background-color: #ffffff;
+}
+
+.flow-field select:focus,
+.flow-field input:focus {
+  border-color: #5b50c8;
+  outline: 3px solid #d9d6ff;
+  outline-offset: 2px;
+}
+
+.required {
+  color: #747786;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* 분실/습득 선택 */
+.choice-group {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.flow-field .choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  margin-top: 8px;
+  padding: 8px 14px;
+  border: 1px solid #bfc1d1;
+  border-radius: 8px;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.flow-field .choice input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: #5b50c8;
+}
+
+.flow-field .choice-group.is-error .choice {
+  border-color: #b3261e;
+  background-color: #fff6f5;
+}
+
+.flow-field .field-count {
+  margin-top: 6px;
+}
+
+.field-help {
+  margin: 6px 0 0;
+  color: #5e6272;
+  font-size: 14px;
+}
+
+/* 오류 안내: 무엇이 잘못됐는지와 고치는 방법 */
+.field-error,
+.step-error {
+  margin: 6px 0 0;
+  color: #b3261e;
+  font-weight: 700;
+}
+
+.field-error:empty,
+.step-error:empty {
+  display: none;
+}
+
+.step-error {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: #fff6f5;
+}
+
+.flow-field select.is-error,
+.flow-field input.is-error {
+  border-color: #b3261e;
+  background-color: #fff6f5;
+}
+
+.flow-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.secondary-button,
+.text-button {
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-button {
+  padding: 12px 18px;
+  border: 1px solid #5b50c8;
+  border-radius: 8px;
+  color: #5b50c8;
+  background-color: #ffffff;
+}
+
+.secondary-button:hover {
+  background-color: #ebe9ff;
+}
+
+.text-button {
+  padding: 6px 8px;
+  border: none;
+  color: #5b50c8;
+  text-decoration: underline;
+  background: none;
+}
+
+.secondary-button:focus,
+.text-button:focus {
+  outline: 3px solid #b9b4ef;
+  outline-offset: 3px;
+}
+
+.flow-help {
+  color: #5e6272;
+}
+
+/* 확인·완료 화면의 요약 목록 */
+.summary-list {
+  margin: 0 0 20px;
+  border: 1px solid #d7d4f6;
+  border-radius: 10px;
+  background-color: #ffffff;
+}
+
+.summary-list > div {
+  display: flex;
+  gap: 12px;
+  padding: 10px 14px;
+}
+
+.summary-list > div + div {
+  border-top: 1px solid #e0e1ec;
+}
+
+.summary-list dt {
+  flex: 0 0 96px;
+  color: #747786;
+  font-weight: 700;
+}
+
+.summary-list dd {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* 완료 상태 */
+.flow-panel.is-done {
+  border-color: #1f7a4d;
+  background-color: #eef9f2;
+}
+
+.flow-panel.is-done .flow-progress {
+  color: #245c3a;
+}
+
+.done-message {
+  padding: 12px;
+  border-radius: 10px;
+  color: #245c3a;
+  font-weight: 700;
+  background-color: #e7f7ed;
+}
+
+@media (max-width: 768px) {
+  .flow-panel {
+    padding: 16px;
+  }
+
+  .flow-steps li {
+    font-size: 13px;
+  }
+
+  .flow-actions {
+    flex-direction: column-reverse;
+  }
+
+  .flow-actions .primary-button,
+  .flow-actions .secondary-button {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  #flowStart {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .flow-field select,
+  .flow-field input[type="date"],
+  .flow-field input[type="email"],
+  .flow-field input[type="text"] {
+    min-height: 48px;
+  }
+
+  .text-button {
+    min-height: 44px;
+  }
+
+  .summary-list > div {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .summary-list dt {
+    flex-basis: auto;
+  }
+}
+
+/* 어두운 테마: 단계별 제보 흐름 */
+body.dark .flow-intro,
+body.dark .flow-help,
+body.dark .field-help {
+  color: #d8d8e2;
+}
+
+body.dark .flow-panel {
+  border-color: #50515f;
+  background-color: #383947;
+}
+
+body.dark .flow-progress {
+  color: #c9c5ff;
+}
+
+body.dark .flow-steps li {
+  color: #b5b7c4;
+  border-color: #50515f;
+}
+
+body.dark .flow-steps li.is-current {
+  color: #c9c5ff;
+  border-color: #c9c5ff;
+}
+
+body.dark .flow-steps li.is-done {
+  color: #c7f0d4;
+  border-color: #4fbf80;
+}
+
+body.dark .flow-field select,
+body.dark .flow-field input[type="date"],
+body.dark .flow-field input[type="email"],
+body.dark .flow-field input[type="text"],
+body.dark .flow-field .choice {
+  color: #f4f4f8;
+  border-color: #6a6b7c;
+  background-color: #20212a;
+}
+
+body.dark .flow-field input[type="date"] {
+  color-scheme: dark;
+}
+
+body.dark .required {
+  color: #b5b7c4;
+}
+
+body.dark .field-error,
+body.dark .step-error {
+  color: #ff8a80;
+}
+
+body.dark .step-error,
+body.dark .flow-field .choice-group.is-error .choice,
+body.dark .flow-field select.is-error,
+body.dark .flow-field input.is-error {
+  border-color: #ff8a80;
+  background-color: #3a2a2c;
+}
+
+body.dark .secondary-button {
+  color: #c9c5ff;
+  border-color: #c9c5ff;
+  background-color: #2d2e38;
+}
+
+body.dark .secondary-button:hover {
+  background-color: #3a3b4a;
+}
+
+body.dark .text-button {
+  color: #c9c5ff;
+  background: none;
+}
+
+body.dark .summary-list {
+  border-color: #50515f;
+  background-color: #2d2e38;
+}
+
+body.dark .summary-list > div + div {
+  border-color: #50515f;
+}
+
+body.dark .summary-list dt {
+  color: #b5b7c4;
+}
+
+body.dark .flow-panel.is-done {
+  border-color: #4fbf80;
+  background-color: #1f3a2b;
+}
+
+body.dark .flow-panel.is-done .flow-progress,
+body.dark .done-message {
+  color: #c7f0d4;
+}
+
+body.dark .done-message {
+  background-color: #1f4a30;
+}
