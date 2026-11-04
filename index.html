@@ -14,7 +14,7 @@
   목적: 분실물 제보 방법과 찾아가는 과정을 이해한다
   핵심 행동: 필요한 안내 영역으로 이동하고, 단계별로 분실·습득 제보를 완료한 뒤 내 제보 목록에서 다시 보거나 취소한다
   완료 조건: 제보 내용 확인 화면에서 제보를 완료해 접수번호 화면에 도달하고, 내 제보 목록에서 그 제보를 확인할 수 있다
-  정보 순서: 서비스 소개 → 주요 기능 → 이용 방법 → 단계별 제보 → 내 제보 목록 → 빠른 제보
+  정보 순서: 서비스 소개 → 주요 기능 → 이용 방법 → 단계별 제보 → 내 제보 목록
   -->
 
   <header class="site-header">
@@ -28,7 +28,6 @@
       <a href="#steps">이용 방법</a>
       <a href="#flow">단계별 제보</a>
       <a href="#myReports">내 제보 목록</a>
-      <a href="#report">분실·습득 제보</a>
     </nav>
 
     <button class="theme-button" id="themeButton" type="button" aria-pressed="false">어두운 테마로 바꾸기</button>
@@ -109,7 +108,7 @@
       <ol class="steps-list">
         <li>서비스 소개를 읽고 이용 방법을 파악합니다.</li>
         <li>‘단계별 제보’에서 분실인지 습득인지 선택하고 물건·장소·연락처를 입력합니다.</li>
-        <li>입력한 내용을 확인하고 제보를 완료합니다. 이메일만 남기는 빠른 제보도 쓸 수 있습니다.</li>
+        <li>입력한 내용을 확인하고 제보를 완료합니다.</li>
       </ol>
     </section>
 
@@ -139,7 +138,7 @@
               <fieldset class="choice-group" id="flowTypeGroup" aria-describedby="flowTypeError">
                 <legend>제보 종류 <span class="required">(필수)</span></legend>
                 <label class="choice"><input type="radio" name="flowType" value="lost"> 물건을 잃어버렸어요</label>
-                <label class="choice"><input type="radio" name="flowType" value="found"> 물건을 주웠어요</label>
+                <label class="choice"><input type="radio" name="flowType" value="found" aria-controls="flowKeepField" aria-expanded="false"> 물건을 주웠어요</label>
               </fieldset>
               <p class="field-error" id="flowTypeError" role="alert"></p>
             </div>
@@ -231,8 +230,9 @@
             <dl class="summary-list" id="flowSummary"></dl>
             <div class="flow-actions">
               <button class="secondary-button flow-back" type="button" data-step="3">장소·연락 수정하기</button>
-              <button class="primary-button" id="flowSubmit" type="button">제보 완료하기</button>
+              <button class="primary-button" id="flowSubmit" type="submit">제보 완료하기</button>
             </div>
+            <p class="flow-submit-status" id="flowSubmitStatus" role="status" aria-live="polite"></p>
           </section>
 
           <section class="flow-step" data-step="4" hidden>
@@ -252,47 +252,6 @@
       <h2>내 제보 목록</h2>
       <p class="my-reports-empty" id="myReportsEmpty">아직 등록된 제보가 없어요. ‘단계별 제보’를 완료하면 여기에서 다시 보거나, 물건을 찾았을 때 취소할 수 있어요.</p>
       <ul class="my-reports-list" id="myReportsList" hidden></ul>
-    </section>
-
-    <section id="report" class="content-section report-section">
-      <h2>분실·습득 제보</h2>
-      <form class="report-form" novalidate>
-        <div class="form-field">
-          <label for="reportType">제보 종류</label>
-          <select id="reportType" name="reportType">
-            <option value="lost">물건을 잃어버렸어요</option>
-            <option value="found">물건을 주웠어요</option>
-          </select>
-        </div>
-
-        <div class="form-field">
-          <label for="itemInfo">물건 특징</label>
-          <input
-            type="text"
-            id="itemInfo"
-            name="itemInfo"
-            maxlength="30"
-            placeholder="예: 검은색 에어팟 케이스"
-            aria-describedby="itemInfoCount"
-          >
-          <p class="field-count" id="itemInfoCount" aria-live="polite">0 / 30</p>
-        </div>
-
-        <div class="form-field">
-          <label for="email">이메일</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="name@example.com"
-            autocomplete="email"
-            aria-describedby="reportMessage"
-          >
-        </div>
-
-        <button class="primary-button" id="reportButton" type="submit">분실 제보 보내기</button>
-      </form>
-      <p class="report-message" id="reportMessage" role="status" aria-live="polite">잃어버린 물건의 특징과 연락받을 이메일을 입력해 주세요.</p>
     </section>
   </main>
 

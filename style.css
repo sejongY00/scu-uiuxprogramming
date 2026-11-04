@@ -185,52 +185,6 @@ h3 {
   margin-top: 10px;
 }
 
-/* 분실·습득 제보: 입력창과 버튼을 한 줄로 배치 */
-.report-section {
-  background-color: #f0efff;
-}
-
-.report-form {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 16px;
-  max-width: 570px;
-}
-
-.form-field {
-  width: 100%;
-}
-
-.form-field label {
-  display: block;
-  font-weight: 700;
-}
-
-.form-field select,
-input[type="email"],
-input[type="text"] {
-  display: block;
-  width: 100%;
-  margin-top: 8px;
-  padding: 12px 14px;
-  border: 1px solid #bfc1d1;
-  border-radius: 8px;
-  font: inherit;
-}
-
-.form-field select {
-  background-color: #ffffff;
-}
-
-.form-field select:focus,
-input[type="text"]:focus,
-input[type="email"]:focus {
-  border-color: #5b50c8;
-  outline: 3px solid #d9d6ff;
-  outline-offset: 2px;
-}
-
 .primary-button {
   padding: 12px 18px;
   border: none;
@@ -318,11 +272,6 @@ input[type="email"]:focus {
     padding: 20px;
   }
 
-  /* 제보 폼의 입력창과 버튼을 화면 너비에 맞춤 */
-  .report-form {
-    align-items: stretch;
-  }
-
   .primary-button {
     width: 100%;
   }
@@ -332,34 +281,7 @@ input[type="email"]:focus {
   }
 }
 
-/* 5주차: 제보 처리 결과 안내 문구와 버튼 상태 */
-.report-message {
-  max-width: 570px;
-  min-height: 1.6em;
-  margin: 14px 0 0;
-  color: #5e6272;
-  font-weight: 700;
-}
-
-/* 이메일이 잘못되었을 때 */
-.report-message.is-error {
-  color: #b3261e;
-}
-
-input[type="email"].is-error {
-  border-color: #b3261e;
-  background-color: #fff6f5;
-}
-
-/* JavaScript가 is-success를 추가하면 접수 완료 상태가 보입니다. */
-.report-message.is-success {
-  padding: 12px;
-  border-radius: 10px;
-  color: #245c3a;
-  background-color: #e7f7ed;
-}
-
-/* 접수 뒤 버튼을 비활성화합니다. */
+/* 제출 중이거나 접수가 끝난 버튼을 비활성화합니다. */
 .primary-button:disabled {
   color: #ffffff;
   background-color: #a8a8b2;
@@ -367,7 +289,7 @@ input[type="email"].is-error {
   transform: none;
 }
 
-/* 6주차: 글자 수 안내, 제보 종류별 버튼 색, 테마 버튼 */
+/* 6주차: 글자 수 안내, 테마 버튼 */
 .field-count {
   margin: 6px 0 0;
   color: #747786;
@@ -379,25 +301,6 @@ input[type="email"].is-error {
 .field-count.is-near-limit {
   color: #b3261e;
   font-weight: 700;
-}
-
-input[type="text"].is-error {
-  border-color: #b3261e;
-  background-color: #fff6f5;
-}
-
-/* 습득 등록을 고르면 버튼 색이 바뀝니다. */
-.primary-button.is-found {
-  background-color: #1f7a4d;
-}
-
-.primary-button.is-found:hover {
-  background-color: #17603c;
-}
-
-.primary-button:disabled,
-.primary-button.is-found:disabled {
-  background-color: #a8a8b2;
 }
 
 .theme-button {
@@ -433,7 +336,6 @@ body.dark .eyebrow {
 
 body.dark .header-description,
 body.dark .panel p,
-body.dark .report-message,
 body.dark .field-count {
   color: #d8d8e2;
 }
@@ -443,8 +345,7 @@ body.dark .site-nav a:hover {
   background-color: #3a3b4a;
 }
 
-body.dark .content-section,
-body.dark .report-section {
+body.dark .content-section {
   border-color: #50515f;
   background-color: #2d2e38;
 }
@@ -472,28 +373,8 @@ body.dark .tab.is-active {
   background-color: #383947;
 }
 
-body.dark input[type="email"],
-body.dark input[type="text"],
-body.dark .form-field select {
-  color: #f4f4f8;
-  border-color: #6a6b7c;
-  background-color: #20212a;
-}
-
-body.dark input[type="email"].is-error,
-body.dark input[type="text"].is-error {
-  border-color: #ff8a80;
-  background-color: #3a2a2c;
-}
-
-body.dark .report-message.is-error,
 body.dark .field-count.is-near-limit {
   color: #ff8a80;
-}
-
-body.dark .report-message.is-success {
-  color: #c7f0d4;
-  background-color: #1f4a30;
 }
 
 body.dark .site-footer {
@@ -605,6 +486,39 @@ body.dark .site-footer {
   border-color: #5b50c8;
   outline: 3px solid #d9d6ff;
   outline-offset: 2px;
+}
+
+/* 필수 조건을 채운 항목은 테두리 색과 문구로 함께 보여 줍니다. */
+.flow-field.is-valid input {
+  border-color: #1f7a4d;
+}
+
+/* 조건에 맞지 않아 숨겨진 선택 칸은 disabled로도 막아 둡니다. */
+.flow-field select:disabled {
+  color: #9a9ba8;
+  background-color: #f1f1f6;
+  cursor: not-allowed;
+}
+
+/* 제출 중·실패 안내 */
+.flow-submit-status {
+  margin: 12px 0 0;
+  font-weight: 700;
+}
+
+.flow-submit-status:empty {
+  display: none;
+}
+
+.flow-submit-status.is-pending {
+  color: #5b50c8;
+}
+
+.flow-submit-status.is-error {
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #b3261e;
+  background-color: #fff6f5;
 }
 
 .required {
@@ -866,6 +780,24 @@ body.dark .flow-field .choice {
 
 body.dark .flow-field input[type="date"] {
   color-scheme: dark;
+}
+
+body.dark .flow-field.is-valid input {
+  border-color: #4fbf80;
+}
+
+body.dark .flow-field select:disabled {
+  color: #6a6b7c;
+  background-color: #2d2e38;
+}
+
+body.dark .flow-submit-status.is-pending {
+  color: #c9c5ff;
+}
+
+body.dark .flow-submit-status.is-error {
+  color: #ff8a80;
+  background-color: #3a2a2c;
 }
 
 body.dark .required {

@@ -1,7 +1,7 @@
-// 5주차: 분실·습득 제보 — 이메일을 확인하고 처리 결과를 화면에 알려 줍니다.
-// 6주차: click(테마·제보 보내기)·input(글자 수)·change(제보 종류) 이벤트와 기능 탭을 추가합니다.
+// 6주차: click(테마)·input(글자 수)·change(제보 종류) 이벤트와 기능 탭을 추가합니다.
 // 7주차: 물건 정보 → 장소·연락 → 확인 → 완료로 이어지는 단계별 제보 흐름을 추가합니다.
 // 중간고사: 완료된 제보를 '내 제보 목록'에 쌓아 다시 보거나 취소할 수 있게 합니다.
+// 9주차: 이메일만 남기던 빠른 제보를 지우고, 단계별 제보 하나로 합쳤습니다.
 console.log("JavaScript가 연결되었습니다.");
 
 // 1. 변하지 않는 값은 const로 저장합니다.
@@ -11,35 +11,15 @@ const itemInfoWarningLength = 25;
 
 // 제보 종류(분실/습득)마다 달라지는 문구입니다.
 const reportTypes = {
-  lost: {
-    label: "분실",
-    buttonText: "분실 제보 보내기",
-    message: "잃어버린 물건의 특징과 연락받을 이메일을 입력해 주세요.",
-    placeholder: "예: 검은색 에어팟 케이스"
-  },
-  found: {
-    label: "습득",
-    buttonText: "습득 등록하기",
-    message: "주운 물건의 특징과 연락받을 이메일을 입력해 주세요.",
-    placeholder: "예: 학생회관 앞에서 주운 파란 우산"
-  }
+  lost: { label: "분실" },
+  found: { label: "습득" }
 };
 
 // 2. 제보 전후로 바뀌는 상태는 let으로 저장합니다.
-let isReported = false; // Boolean: 접수 여부
 let reportCount = 0; // Number: 이번 방문에서 접수한 제보 수
 
 // 3. JavaScript가 바꿀 요소를 id로 찾습니다.
 const themeButton = document.querySelector("#themeButton");
-const reportTypeSelect = document.querySelector("#reportType");
-const itemInfoInput = document.querySelector("#itemInfo");
-const itemInfoCount = document.querySelector("#itemInfoCount");
-const emailInput = document.querySelector("#email");
-const reportButton = document.querySelector("#reportButton");
-const reportMessage = document.querySelector("#reportMessage");
-
-// 자료형을 예상한 대로 쓰고 있는지 Console에서 확인합니다.
-console.log(typeof reportTypes.lost.message, typeof reportCount, typeof isReported); // string number boolean
 
 // ---------- click: 화면 테마 바꾸기 ----------
 
@@ -53,33 +33,7 @@ function handleThemeClick() {
   themeButton.setAttribute("aria-pressed", String(isDark));
 }
 
-// ---------- input: 물건 특징 글자 수 ----------
-
-// 5. 글자를 쓰거나 지울 때마다 글자 수를 보여 주고, 한도에 가까워지면 색을 바꿉니다.
-function handleItemInfoInput() {
-  const currentLength = itemInfoInput.value.length;
-
-  itemInfoCount.textContent = currentLength + " / " + itemInfoLimit;
-  itemInfoCount.classList.toggle("is-near-limit", currentLength >= itemInfoWarningLength);
-}
-
-// ---------- change: 제보 종류 선택 ----------
-
-// 6. 분실/습득을 고르면 버튼 문구·안내 문구·입력 예시·버튼 색이 함께 바뀝니다.
-function handleReportTypeChange() {
-  const type = reportTypes[reportTypeSelect.value];
-
-  itemInfoInput.placeholder = type.placeholder;
-  reportButton.classList.toggle("is-found", reportTypeSelect.value === "found");
-  isReported = false;
-  reportButton.disabled = false;
-  reportButton.textContent = type.buttonText;
-  showMessage(type.message, "", null);
-}
-
-// ---------- 5주차: 제보 보내기 ----------
-
-// 7. 이메일에 문제가 있으면 안내 문구를, 없으면 빈 문자열을 반환합니다.
+// 이메일에 문제가 있으면 안내 문구를, 없으면 빈 문자열을 반환합니다.
 function checkEmail(email) {
   if (email === "") {
     return "이메일을 입력해 주세요.";
@@ -99,64 +53,6 @@ function makeReportMessage(typeLabel, email, count) {
     return typeLabel + " " + count + "번째 제보가 접수되었습니다. 학교 메일로 연락드릴게요.";
   }
   return typeLabel + " " + count + "번째 제보가 접수되었습니다. 입력하신 메일로 연락드릴게요.";
-}
-
-// 9. 안내 문구와 문제가 있는 입력창 스타일을 상태에 맞게 바꿉니다.
-function showMessage(text, state, problemField) {
-  reportMessage.textContent = text;
-  reportMessage.classList.remove("is-error", "is-success");
-  itemInfoInput.classList.remove("is-error");
-  emailInput.classList.remove("is-error");
-
-  if (state === "error") {
-    reportMessage.classList.add("is-error");
-    problemField.classList.add("is-error");
-  } else if (state === "success") {
-    reportMessage.classList.add("is-success");
-  }
-}
-
-// 10. 버튼을 누른 순간 실행할 동작입니다.
-function sendReport(event) {
-  event.preventDefault(); // 페이지가 새로고침되지 않게 막습니다.
-
-  const itemInfo = itemInfoInput.value.trim();
-  const email = emailInput.value.trim();
-  const emailProblem = checkEmail(email);
-
-  if (itemInfo === "") {
-    isReported = false;
-    showMessage("물건 특징을 입력해 주세요.", "error", itemInfoInput);
-    itemInfoInput.focus();
-    return;
-  }
-
-  if (emailProblem !== "") {
-    isReported = false;
-    showMessage(emailProblem, "error", emailInput);
-    emailInput.focus();
-    return;
-  }
-
-  isReported = true;
-  reportCount = reportCount + 1;
-  showMessage(
-    makeReportMessage(reportTypes[reportTypeSelect.value].label, email, reportCount),
-    "success",
-    null
-  );
-  reportButton.textContent = "접수 완료";
-  reportButton.disabled = true; // 같은 제보가 반복되지 않게 막습니다.
-}
-
-// 11. 접수 뒤 내용을 고치면 새 제보로 보고 버튼을 다시 켭니다.
-function resetReport() {
-  if (isReported === true) {
-    isReported = false;
-    reportButton.textContent = reportTypes[reportTypeSelect.value].buttonText;
-    reportButton.disabled = false;
-    showMessage(reportTypes[reportTypeSelect.value].message, "", null);
-  }
 }
 
 // ---------- 탭: 주요 기능 전환 ----------
@@ -195,11 +91,6 @@ function handleTabClick(event) {
 
 // 14. 이벤트와 함수를 연결합니다.
 themeButton.addEventListener("click", handleThemeClick);
-itemInfoInput.addEventListener("input", handleItemInfoInput);
-itemInfoInput.addEventListener("input", resetReport);
-reportTypeSelect.addEventListener("change", handleReportTypeChange);
-reportButton.addEventListener("click", sendReport);
-emailInput.addEventListener("input", resetReport);
 
 tabs.forEach(function (tab) {
   tab.addEventListener("click", handleTabClick);
@@ -217,6 +108,7 @@ const flowTotalSteps = flowStepNames.length;
 
 // 16. 흐름 안에서 바뀌는 상태입니다. 0은 아직 시작하지 않은 상태, 4는 완료 상태입니다.
 let flowStep = 0;
+let isFlowSubmitting = false; // 제출 중에는 true로 바뀌어 중복 제출을 막습니다.
 
 const flowStart = document.querySelector("#flowStart");
 const flowPanel = document.querySelector("#flowPanel");
@@ -234,7 +126,10 @@ const flowDate = document.querySelector("#flowDate");
 const flowDateLabel = document.querySelector("#flowDateLabel");
 const flowKeepField = document.querySelector("#flowKeepField");
 const flowKeep = document.querySelector("#flowKeep");
+const flowFoundRadio = document.querySelector('input[name="flowType"][value="found"]');
 const flowEmail = document.querySelector("#flowEmail");
+const flowSubmit = document.querySelector("#flowSubmit");
+const flowSubmitStatus = document.querySelector("#flowSubmitStatus");
 const flowSummary = document.querySelector("#flowSummary");
 const flowDoneSummary = document.querySelector("#flowDoneSummary");
 const flowDoneMessage = document.querySelector("#flowDoneMessage");
@@ -321,6 +216,7 @@ function showFlowProblems(section, problems) {
 
     wrapper.querySelector(".field-error").textContent = problem.message;
     problem.field.classList.add("is-error");
+    problem.field.dataset.wasInvalid = "true"; // 한 번이라도 틀린 적 있으면, 고치는 동안 바로바로 다시 검사합니다.
     if (problem.field.tagName !== "FIELDSET") {
       problem.field.setAttribute("aria-invalid", "true");
     }
@@ -402,6 +298,8 @@ function showFlowStep(step) {
   }
   if (step === 3) {
     fillSummary(flowSummary, true);
+    flowSubmitStatus.textContent = "";
+    flowSubmitStatus.classList.remove("is-pending", "is-error");
   }
 
   const heading = flowSections[step - 1].querySelector("h3");
@@ -410,13 +308,17 @@ function showFlowStep(step) {
   flowPanel.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-// 23. 제보 종류에 따라 날짜 문구와 보관 장소 입력 칸을 바꿉니다.
+// 23. 제보 종류에 따라 날짜 문구와 보관 장소 입력 칸을 바꿉니다. 숨겨진 선택 칸은 disabled로 막습니다.
 function updateFlowTypeView() {
   const type = getFlowValues().type;
+  const showKeep = type === "found";
 
   flowDateLabel.innerHTML = (type === "" ? "날짜" : flowDateLabels[type]) + ' <span class="required">(필수)</span>';
-  flowKeepField.hidden = type !== "found";
-  if (type !== "found") {
+  flowKeepField.hidden = !showKeep;
+  flowKeep.disabled = !showKeep;
+  flowFoundRadio.setAttribute("aria-expanded", String(showKeep));
+  if (showKeep === false) {
+    flowKeep.value = "";
     clearFlowErrors(flowKeepField);
   }
 }
@@ -460,8 +362,14 @@ function handleSummaryEdit(event) {
   }
 }
 
-// 28. 완료 버튼: 다시 한 번 검사한 뒤 접수번호와 완료 화면을 보여 주고, 내 제보 목록에 더합니다.
-function handleFlowSubmit() {
+// 28. 완료 버튼(submit): 다시 한 번 검사한 뒤 제출 중 상태를 보여 주고, 접수 결과에 따라 완료 화면이나 실패 안내를 보여 줍니다.
+function handleFlowSubmit(event) {
+  event.preventDefault();
+
+  if (isFlowSubmitting === true) {
+    return; // 이미 접수 중이면 같은 내용이 두 번 접수되지 않게 막습니다.
+  }
+
   for (let step = 1; step <= 2; step = step + 1) {
     const problems = checkFlowStep(step);
 
@@ -471,6 +379,34 @@ function handleFlowSubmit() {
       return;
     }
   }
+
+  isFlowSubmitting = true;
+  flowSubmit.disabled = true;
+  flowSubmit.textContent = "제출 중...";
+  flowSubmitStatus.classList.remove("is-error");
+  flowSubmitStatus.classList.add("is-pending");
+  flowSubmitStatus.textContent = "제보를 접수하고 있어요. 잠시만 기다려 주세요.";
+
+  window.setTimeout(finishFlowSubmit, 900);
+}
+
+// 29. 제출 결과를 가짜로 흉내 냅니다(서버가 없어 5번 중 1번은 접수 실패로 처리합니다). 실패하면 입력값을 그대로 두고 다시 제출할 수 있습니다.
+function finishFlowSubmit() {
+  isFlowSubmitting = false;
+  flowSubmit.disabled = false;
+  flowSubmit.textContent = "제보 완료하기";
+
+  const didFail = Math.random() < 0.2;
+
+  if (didFail === true) {
+    flowSubmitStatus.classList.remove("is-pending");
+    flowSubmitStatus.classList.add("is-error");
+    flowSubmitStatus.textContent = "접수 중 문제가 생겼어요. 입력하신 내용은 그대로 남아 있어요. ‘제보 완료하기’를 다시 눌러 주세요.";
+    return;
+  }
+
+  flowSubmitStatus.classList.remove("is-pending", "is-error");
+  flowSubmitStatus.textContent = "";
 
   const values = getFlowValues();
 
@@ -505,22 +441,56 @@ function handleFlowSubmit() {
 function handleFlowRestart() {
   flowForm.reset();
   clearFlowErrors(flowForm);
+  flowForm.querySelectorAll("[data-was-invalid]").forEach(function (field) {
+    delete field.dataset.wasInvalid;
+  });
   flowItemCount.textContent = "0 / " + itemInfoLimit;
   flowItemCount.classList.remove("is-near-limit");
+  flowItem.closest(".flow-field").classList.remove("is-valid");
   flowSummary.textContent = "";
   flowDoneSummary.textContent = "";
   flowDoneMessage.textContent = "";
+  isFlowSubmitting = false;
+  flowSubmit.disabled = false;
+  flowSubmit.textContent = "제보 완료하기";
+  flowSubmitStatus.textContent = "";
+  flowSubmitStatus.classList.remove("is-pending", "is-error");
   updateFlowTypeView();
   showFlowStep(1);
 }
 
-// 30. 입력하거나 고르면 그 항목의 오류 안내를 바로 지웁니다.
+// 30. 한 번이라도 틀렸던 항목은 값을 바꿀 때마다 같은 조건으로 다시 검사해, 고쳐졌으면 풀고 아직 아니면 새 안내를 보여 줍니다.
+// 아직 한 번도 틀린 적 없는 항목은 입력 중에 빨간 오류를 띄우지 않습니다.
+function revalidateFlowField(fieldElement, step) {
+  const wrapper = fieldElement.closest(".flow-field");
+  const touchedBefore = wrapper.querySelector("[data-was-invalid]") !== null;
+
+  if (touchedBefore === false) {
+    return;
+  }
+
+  const problems = checkFlowStep(step);
+  const problem = problems.find(function (item) {
+    return item.field === fieldElement;
+  });
+
+  clearFlowErrors(wrapper);
+  if (problem !== undefined) {
+    wrapper.querySelector(".field-error").textContent = problem.message;
+    problem.field.classList.add("is-error");
+    problem.field.dataset.wasInvalid = "true";
+    if (problem.field.tagName !== "FIELDSET") {
+      problem.field.setAttribute("aria-invalid", "true");
+    }
+  }
+}
+
 function handleFlowFieldChange(event) {
   const wrapper = event.target.closest(".flow-field");
   const section = event.target.closest(".flow-step");
 
-  if (wrapper !== null) {
-    clearFlowErrors(wrapper);
+  if (wrapper !== null && section !== null) {
+    revalidateFlowField(event.target, Number(section.dataset.step));
   }
   if (section !== null && section.querySelectorAll(".field-error:not(:empty)").length === 0) {
     section.querySelector(".step-error").textContent = "";
@@ -530,11 +500,16 @@ function handleFlowFieldChange(event) {
   }
 }
 
+// 물건 특징은 글자 수와 함께, 필수 조건을 채웠는지도 색·문구로 보여 줍니다.
 function handleFlowItemInput() {
   const currentLength = flowItem.value.length;
+  const meetsCondition = flowItem.value.trim().length > 0;
 
-  flowItemCount.textContent = currentLength + " / " + itemInfoLimit;
+  flowItemCount.textContent = meetsCondition
+    ? currentLength + " / " + itemInfoLimit + " · 입력 조건을 충족했습니다."
+    : currentLength + " / " + itemInfoLimit;
   flowItemCount.classList.toggle("is-near-limit", currentLength >= itemInfoWarningLength);
+  flowItem.closest(".flow-field").classList.toggle("is-valid", meetsCondition);
 }
 
 // 31. 입력창에서 Enter를 누르면 현재 단계의 진행 버튼을 누른 것과 같게 처리합니다.
@@ -551,9 +526,7 @@ flowItem.addEventListener("input", handleFlowItemInput);
 flowForm.addEventListener("input", handleFlowFieldChange);
 flowForm.addEventListener("change", handleFlowFieldChange);
 flowForm.addEventListener("keydown", handleFlowKeydown);
-flowForm.addEventListener("submit", function (event) {
-  event.preventDefault();
-});
+flowForm.addEventListener("submit", handleFlowSubmit);
 flowSummary.addEventListener("click", handleSummaryEdit);
 document.querySelectorAll(".flow-next").forEach(function (button) {
   button.addEventListener("click", handleFlowNext);
@@ -561,7 +534,6 @@ document.querySelectorAll(".flow-next").forEach(function (button) {
 document.querySelectorAll(".flow-back").forEach(function (button) {
   button.addEventListener("click", handleFlowBack);
 });
-document.querySelector("#flowSubmit").addEventListener("click", handleFlowSubmit);
 document.querySelector("#flowRestart").addEventListener("click", handleFlowRestart);
 document.querySelector("#flowRestartTop").addEventListener("click", handleFlowRestart);
 
