@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>캠퍼스 분실물 | 서비스 소개</title>
+  <meta name="description" content="교내에서 잃어버리거나 주운 물건을 단계별로 제보하고, 내 제보 목록에서 다시 보거나 취소할 수 있는 캠퍼스 분실물 서비스입니다.">
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -12,28 +13,38 @@
   <!--
   사용자: 교내에서 물건을 잃어버리거나 주운 학생·교직원
   목적: 분실물 제보 방법과 찾아가는 과정을 이해한다
-  핵심 행동: 필요한 안내 영역으로 이동하고, 단계별로 분실·습득 제보를 완료한 뒤 내 제보 목록에서 다시 보거나 취소한다
+  핵심 행동: 상단 메뉴로 필요한 영역에 이동하고, 단계별로 분실·습득 제보를 완료한 뒤 내 제보 목록에서 상태별로 골라 보거나 취소한다
   완료 조건: 제보 내용 확인 화면에서 제보를 완료해 접수번호 화면에 도달하고, 내 제보 목록에서 그 제보를 확인할 수 있다
   정보 순서: 서비스 소개 → 주요 기능 → 이용 방법 → 단계별 제보 → 내 제보 목록
+  주요 메뉴: 서비스 소개(#about) → 단계별 제보(#flow) → 내 제보 목록(#myReports)
   -->
 
   <header class="site-header">
-    <p class="eyebrow">CAMPUS LOST &amp; FOUND</p>
-    <h1>캠퍼스 분실물</h1>
-    <p class="header-description">교내에서 잃어버린 물건과 주운 물건을 한곳에서 올리고 찾아갑니다.</p>
+    <div class="header-inner">
+      <a class="logo" href="#about">캠퍼스 분실물</a>
 
-    <nav class="site-nav" aria-label="주요 메뉴">
-      <a href="#about">서비스 소개</a>
-      <a href="#features">주요 기능</a>
-      <a href="#steps">이용 방법</a>
-      <a href="#flow">단계별 제보</a>
-      <a href="#myReports">내 제보 목록</a>
-    </nav>
+      <button id="menu-toggle" class="menu-toggle" type="button"
+        aria-controls="main-nav" aria-expanded="false">
+        메뉴 열기
+      </button>
 
-    <button class="theme-button" id="themeButton" type="button" aria-pressed="false">어두운 테마로 바꾸기</button>
+      <nav id="main-nav" class="main-nav" aria-label="주요 메뉴">
+        <ul>
+          <li><a href="#about">서비스 소개</a></li>
+          <li><a href="#flow">단계별 제보</a></li>
+          <li><a href="#myReports">내 제보 목록</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
   <main>
+    <div class="hero">
+      <h1>캠퍼스 분실물</h1>
+      <p class="header-description">교내에서 잃어버린 물건과 주운 물건을 한곳에서 올리고 찾아갑니다.</p>
+      <button class="theme-button" id="themeButton" type="button" aria-pressed="false">어두운 테마로 바꾸기</button>
+    </div>
+
     <section id="about" class="content-section">
       <h2>서비스 소개</h2>
       <div class="about-layout">
@@ -250,7 +261,25 @@
 
     <section id="myReports" class="content-section my-reports-section">
       <h2>내 제보 목록</h2>
-      <p class="my-reports-empty" id="myReportsEmpty">아직 등록된 제보가 없어요. ‘단계별 제보’를 완료하면 여기에서 다시 보거나, 물건을 찾았을 때 취소할 수 있어요.</p>
+
+      <div class="report-filters" role="group" aria-label="내 제보 표시 범위">
+        <button class="filter-button is-active"
+          type="button" data-filter="all" aria-pressed="true">전체</button>
+        <button class="filter-button"
+          type="button" data-filter="active" aria-pressed="false">접수됨</button>
+        <button class="filter-button"
+          type="button" data-filter="cancelled" aria-pressed="false">취소됨</button>
+      </div>
+
+      <p class="reports-status" id="myReportsStatus" role="status" aria-live="polite">
+        표시 중인 제보 <strong id="myReportsCount">0</strong>건
+      </p>
+
+      <div class="my-reports-empty" id="myReportsEmpty">
+        <h3>아직 등록된 제보가 없어요.</h3>
+        <p>‘단계별 제보’를 완료하면 여기에서 다시 보거나, 물건을 찾았을 때 취소할 수 있어요.</p>
+        <a class="text-button" href="#flow">제보하러 가기</a>
+      </div>
       <ul class="my-reports-list" id="myReportsList" hidden></ul>
     </section>
   </main>

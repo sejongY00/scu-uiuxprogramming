@@ -2,6 +2,7 @@
 // 7주차: 물건 정보 → 장소·연락 → 확인 → 완료로 이어지는 단계별 제보 흐름을 추가합니다.
 // 중간고사: 완료된 제보를 '내 제보 목록'에 쌓아 다시 보거나 취소할 수 있게 합니다.
 // 9주차: 이메일만 남기던 빠른 제보를 지우고, 단계별 제보 하나로 합쳤습니다.
+// 10주차: 주소(#)에 맞춘 현재 메뉴 표시, 모바일 메뉴 버튼, 내 제보 목록 상태 필터를 추가합니다.
 console.log("JavaScript가 연결되었습니다.");
 
 // 1. 변하지 않는 값은 const로 저장합니다.
@@ -20,6 +21,54 @@ let reportCount = 0; // Number: 이번 방문에서 접수한 제보 수
 
 // 3. JavaScript가 바꿀 요소를 id로 찾습니다.
 const themeButton = document.querySelector("#themeButton");
+const navLinks = document.querySelectorAll(".main-nav a");
+const menuToggle = document.querySelector("#menu-toggle");
+const mainNav = document.querySelector("#main-nav");
+
+// ---------- 10주차: 주소와 현재 메뉴 연결 ----------
+
+// 주소에 #가 없으면 첫 메뉴를, 있으면 같은 href를 가진 메뉴 하나만 현재 위치로 표시합니다.
+// 다른 메뉴에서는 강조와 aria-current를 지워 두 개가 동시에 표시되지 않게 합니다.
+function updateCurrentNav() {
+  const currentHash = window.location.hash;
+
+  navLinks.forEach((link) => {
+    const current = currentHash
+      ? link.getAttribute("href") === currentHash
+      : link === navLinks[0];
+
+    link.classList.toggle("is-current", current);
+
+    if (current) {
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+}
+
+// hashchange는 메뉴 클릭뿐 아니라 뒤로·앞으로 가기로 주소가 바뀔 때도 발생합니다.
+window.addEventListener("hashchange", updateCurrentNav);
+updateCurrentNav();
+
+// ---------- 10주차: 모바일 메뉴 열고 닫기 ----------
+
+// 메뉴의 실제 표시(is-open), 버튼 문구, aria-expanded를 같은 값(isOpen)으로 바꿉니다.
+menuToggle.addEventListener("click", () => {
+  const isOpen = mainNav.classList.toggle("is-open");
+
+  menuToggle.textContent = isOpen ? "메뉴 닫기" : "메뉴 열기";
+  menuToggle.setAttribute("aria-expanded", String(isOpen));
+});
+
+// 목적지를 고르면 이동한 뒤 펼쳐 둔 메뉴를 닫습니다.
+navLinks.forEach((link) => {
+  link.addEventListener("click", () => {
+    mainNav.classList.remove("is-open");
+    menuToggle.textContent = "메뉴 열기";
+    menuToggle.setAttribute("aria-expanded", "false");
+  });
+});
 
 // ---------- click: 화면 테마 바꾸기 ----------
 
@@ -305,7 +354,9 @@ function showFlowStep(step) {
   const heading = flowSections[step - 1].querySelector("h3");
 
   heading.focus({ preventScroll: true });
-  flowPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  // 움직임 줄이기 설정을 켠 사용자에게는 부드러운 스크롤 대신 바로 이동합니다.
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  flowPanel.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
 }
 
 // 23. 제보 종류에 따라 날짜 문구와 보관 장소 입력 칸을 바꿉니다. 숨겨진 선택 칸은 disabled로 막습니다.
@@ -544,6 +595,11 @@ let myReports = [];
 
 const myReportsEmpty = document.querySelector("#myReportsEmpty");
 const myReportsList = document.querySelector("#myReportsList");
+const myReportsCount = document.querySelector("#myReportsCount");
+const filterButtons = document.querySelectorAll(".filter-button");
+
+// 10주차: all은 전체, active는 취소하지 않은 제보, cancelled는 취소한 제보입니다.
+let currentFilter = "all";
 
 // 34. 제보 하나를 카드(li)로 만듭니다. 상태에 따라 취소 버튼 대신 안내 문구를 넣습니다.
 function createReportCard(report) {
@@ -618,22 +674,66 @@ function createReportCard(report) {
   return item;
 }
 
-// 35. 목록을 다시 그립니다. 제보가 없으면 빈 상태 문구만 보여 줍니다.
-function renderMyReportsList() {
-  myReportsList.textContent = "";
+// 10주차: 지금 고른 필터에 맞는 제보만 골라냅니다.
+function getVisibleReports() {
+  return myReports.filter((report) => {
+    if (currentFilter === "all") return true;
+    if (currentFilter === "cancelled") return report.status === "cancelled";
+    return report.status !== "cancelled";
+  });
+}
 
-  if (myReports.length === 0) {
-    myReportsEmpty.hidden = false;
-    myReportsList.hidden = true;
-    return;
+// 35. 목록을 다시 그립니다. 필터에 맞는 제보만 카드로 만들고, 표시 중인 수와 빈 결과 안내를 함께 바꿉니다.
+function renderMyReportsList() {
+  const visibleReports = getVisibleReports();
+
+  myReportsList.replaceChildren();
+  myReportsEmpty.hidden = visibleReports.length !== 0;
+  myReportsList.hidden = visibleReports.length === 0;
+
+  const emptyTitle = myReportsEmpty.querySelector("h3");
+  const emptyDescription = myReportsEmpty.querySelector("p");
+  const emptyAction = myReportsEmpty.querySelector("a");
+
+  if (visibleReports.length === 0) {
+    // 제보가 하나라도 있는데 비었다면 '필터 결과만 없는 경우'입니다. 필터만 보고 판단하면
+    // 제보가 아예 없을 때 '취소됨'을 눌러도 다른 상태를 고르라는 엉뚱한 안내가 나옵니다.
+    const filtered = myReports.length !== 0;
+
+    emptyTitle.textContent = filtered
+      ? "선택한 상태의 제보가 없어요."
+      : "아직 등록된 제보가 없어요.";
+    emptyDescription.textContent = filtered
+      ? "다른 상태를 선택해 보세요."
+      : "‘단계별 제보’를 완료하면 여기에서 다시 보거나, 물건을 찾았을 때 취소할 수 있어요.";
+    emptyAction.hidden = filtered;
   }
 
-  myReportsEmpty.hidden = true;
-  myReportsList.hidden = false;
-  myReports.forEach(function (report) {
+  myReportsCount.textContent = String(visibleReports.length);
+  myReportsCount.setAttribute(
+    "aria-label",
+    `현재 표시 중인 제보 ${visibleReports.length}건`
+  );
+
+  visibleReports.forEach((report) => {
     myReportsList.append(createReportCard(report));
   });
 }
+
+// 10주차: 필터 버튼을 누르면 누른 버튼 하나만 선택 표시·aria-pressed를 켜고 목록을 다시 그립니다.
+filterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    currentFilter = button.dataset.filter;
+
+    filterButtons.forEach((item) => {
+      const selected = item === button;
+      item.classList.toggle("is-active", selected);
+      item.setAttribute("aria-pressed", String(selected));
+    });
+
+    renderMyReportsList();
+  });
+});
 
 // 36. 카드의 '자세히 보기'는 상세 내용을 펼치고 접습니다. '찾았어요'는 그 제보만 취소 상태로 바꿉니다.
 function handleMyReportsListClick(event) {
@@ -660,5 +760,6 @@ function handleMyReportsListClick(event) {
   }
 }
 
-// 37. 이벤트와 함수를 연결합니다.
+// 37. 이벤트와 함수를 연결하고, 처음 화면의 개수와 안내를 맞춥니다.
 myReportsList.addEventListener("click", handleMyReportsListClick);
+renderMyReportsList();
