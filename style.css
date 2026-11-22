@@ -23,7 +23,7 @@
   --color-success-surface: #eef9f2;
   --color-neutral-wash: #e6e6ef;
   --color-disabled-surface: #f1f1f6;
-  --color-disabled-ink: #6c6e7d;
+  --color-disabled-ink: #5e6272;
   --color-disabled-fill: #6c6e7d;
   --dark-page: #20212a;
   --dark-surface: #2d2e38;
@@ -64,6 +64,30 @@ body {
 /* 어두운 테마에서는 포커스 표시를 밝은 보라로 바꿔 어두운 배경에서도 보이게 합니다. */
 body.dark {
   --color-focus: var(--dark-accent);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* 11주차: 첫 Tab에서 본문으로 바로 이동할 수 있는 건너뛰기 링크 */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 20;
+  padding: 10px 14px;
+  border: 2px solid var(--color-accent);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-weight: 700;
+  transform: translateY(-160%);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
 }
 
 /* 긴 제목은 줄 길이를 고르게 나누되 한글 단어 중간에서는 끊지 않고, 아주 긴 단어도 화면 밖으로 넘치지 않게 합니다. */
@@ -138,7 +162,7 @@ main,
   border-radius: 8px;
   color: var(--color-ink-muted);
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -149,8 +173,6 @@ main,
 
 .main-nav a.is-current {
   color: var(--color-accent);
-  background: var(--color-accent-soft);
-  box-shadow: inset 0 -3px 0 var(--color-accent);
 }
 
 .main-nav a:focus-visible,
@@ -458,6 +480,12 @@ body.dark .field-count {
   color: var(--dark-ink-muted);
 }
 
+body.dark .skip-link {
+  border-color: var(--dark-accent);
+  background: var(--dark-surface);
+  color: var(--dark-ink);
+}
+
 body.dark .site-header {
   border-color: var(--dark-line);
   background-color: var(--dark-page);
@@ -475,8 +503,6 @@ body.dark .main-nav a {
 
 body.dark .main-nav a.is-current {
   color: var(--dark-accent);
-  background: var(--dark-raised);
-  box-shadow: inset 0 -3px 0 var(--dark-accent);
 }
 
 body.dark .menu-toggle {
@@ -585,6 +611,10 @@ body.dark .site-footer {
 .flow-steps li.is-done {
   color: var(--color-success-ink);
   border-color: var(--color-success);
+}
+
+.flow-steps li.is-done::before {
+  content: "✓ ";
 }
 
 .flow-step {
@@ -698,6 +728,7 @@ body.dark .site-footer {
 }
 
 .flow-field .choice-group.is-error .choice {
+  border-width: 2px;
   border-color: var(--color-danger);
   background-color: var(--color-danger-wash);
 }
@@ -720,6 +751,12 @@ body.dark .site-footer {
   font-weight: 700;
 }
 
+.field-error::before,
+.step-error::before,
+.flow-submit-status.is-error::before {
+  content: "오류: ";
+}
+
 .field-error:empty,
 .step-error:empty {
   display: none;
@@ -734,6 +771,7 @@ body.dark .site-footer {
 
 .flow-field select.is-error,
 .flow-field input.is-error {
+  border-width: 2px;
   border-color: var(--color-danger);
   background-color: var(--color-danger-wash);
 }
@@ -1031,16 +1069,42 @@ body.dark .done-message {
   border: 1px solid var(--color-line-strong);
   border-radius: 10px;
   background: var(--color-surface);
-  color: var(--color-ink);
+  color: var(--color-ink-muted);
   font: inherit;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
+}
+
+.filter-button:hover {
+  color: var(--color-accent-strong);
+  background: var(--color-accent-soft);
 }
 
 .filter-button.is-active {
   border-color: var(--color-accent);
   background: var(--color-accent);
   color: var(--color-accent-ink);
+}
+
+.filter-button.is-active:hover {
+  color: var(--color-accent-ink);
+  background: var(--color-accent-strong);
+}
+
+/* 11주차: 색을 구분하지 않아도 현재 메뉴와 선택한 필터를 찾을 수 있게 밑줄·기호·굵기를 더합니다. */
+.main-nav a[aria-current="page"] {
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+
+.filter-button[aria-pressed="true"] {
+  font-weight: 800;
+}
+
+.filter-button[aria-pressed="true"]::before {
+  content: "✓ ";
 }
 
 .filter-button:focus-visible {
@@ -1157,8 +1221,11 @@ body.dark .done-message {
   font-weight: 700;
 }
 
+/* 11주차: opacity로 흐리게 하면 글자 대비가 4.5:1 아래로 떨어지므로 점선 테두리와 중립 배경으로 구분합니다. */
 .report-card.is-cancelled {
-  opacity: 0.75;
+  border-style: dashed;
+  border-color: var(--color-line-strong);
+  background-color: var(--color-page);
 }
 
 @media (max-width: 768px) {
@@ -1186,6 +1253,11 @@ body.dark .report-card {
   color: var(--dark-ink);
 }
 
+body.dark .report-card.is-cancelled {
+  border-color: var(--dark-line-strong);
+  background-color: var(--dark-surface);
+}
+
 body.dark .report-status {
   color: var(--dark-success-ink);
   background-color: var(--dark-success-wash);
@@ -1202,14 +1274,24 @@ body.dark .report-card > div > strong {
 
 /* 어두운 테마: 상태 필터와 결과 안내 */
 body.dark .filter-button {
-  color: var(--dark-ink);
+  color: var(--dark-ink-muted);
   border-color: var(--dark-line);
   background-color: var(--dark-surface);
+}
+
+body.dark .filter-button:hover {
+  color: var(--dark-ink);
+  background-color: var(--dark-hover);
 }
 
 body.dark .filter-button.is-active {
   color: var(--dark-page);
   border-color: var(--dark-accent);
+  background-color: var(--dark-accent);
+}
+
+body.dark .filter-button.is-active:hover {
+  color: var(--dark-page);
   background-color: var(--dark-accent);
 }
 

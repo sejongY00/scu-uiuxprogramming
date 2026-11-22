@@ -3,6 +3,7 @@
 // 중간고사: 완료된 제보를 '내 제보 목록'에 쌓아 다시 보거나 취소할 수 있게 합니다.
 // 9주차: 이메일만 남기던 빠른 제보를 지우고, 단계별 제보 하나로 합쳤습니다.
 // 10주차: 주소(#)에 맞춘 현재 메뉴 표시, 모바일 메뉴 버튼, 내 제보 목록 상태 필터를 추가합니다.
+// 11주차: 현재 메뉴 제목 반영, 모바일 메뉴 Esc 닫기, 결과 상태 알림, 취소 후 초점 복귀, 빈 결과 전체 보기를 추가합니다.
 console.log("JavaScript가 연결되었습니다.");
 
 // 1. 변하지 않는 값은 const로 저장합니다.
@@ -27,13 +28,16 @@ const mainNav = document.querySelector("#main-nav");
 
 // ---------- 10주차: 주소와 현재 메뉴 연결 ----------
 
-// 주소에 #가 없으면 첫 메뉴를, 있으면 같은 href를 가진 메뉴 하나만 현재 위치로 표시합니다.
+// 주소에 #가 없거나 메뉴에 없는 위치(#top 등)면 첫 메뉴를, 있으면 같은 href를 가진 메뉴 하나만 현재 위치로 표시합니다.
 // 다른 메뉴에서는 강조와 aria-current를 지워 두 개가 동시에 표시되지 않게 합니다.
 function updateCurrentNav() {
   const currentHash = window.location.hash;
+  const hasMatchingNav = Array.from(navLinks).some(
+    (link) => link.getAttribute("href") === currentHash
+  );
 
   navLinks.forEach((link) => {
-    const current = currentHash
+    const current = hasMatchingNav
       ? link.getAttribute("href") === currentHash
       : link === navLinks[0];
 
@@ -45,6 +49,10 @@ function updateCurrentNav() {
       link.removeAttribute("aria-current");
     }
   });
+
+  const currentLink = document.querySelector('.main-nav a[aria-current="page"]');
+  const pageName = currentLink ? currentLink.textContent.trim() : "홈";
+  document.title = pageName + " | 캠퍼스 분실물";
 }
 
 // hashchange는 메뉴 클릭뿐 아니라 뒤로·앞으로 가기로 주소가 바뀔 때도 발생합니다.
@@ -59,6 +67,16 @@ menuToggle.addEventListener("click", () => {
 
   menuToggle.textContent = isOpen ? "메뉴 닫기" : "메뉴 열기";
   menuToggle.setAttribute("aria-expanded", String(isOpen));
+});
+
+// 11주차: 열린 모바일 메뉴에서 Esc를 누르면 메뉴를 닫고 메뉴 버튼으로 초점을 되돌립니다.
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape" || !mainNav.classList.contains("is-open")) return;
+
+  mainNav.classList.remove("is-open");
+  menuToggle.textContent = "메뉴 열기";
+  menuToggle.setAttribute("aria-expanded", "false");
+  menuToggle.focus();
 });
 
 // 목적지를 고르면 이동한 뒤 펼쳐 둔 메뉴를 닫습니다.
@@ -138,11 +156,36 @@ function handleTabClick(event) {
   activateTab(event.currentTarget);
 }
 
+// 11주차: 주요 기능 탭에서 화살표·Home·End 키로도 탭을 오갈 수 있게 합니다.
+function handleTabKeydown(event) {
+  const tabList = Array.from(tabs);
+  const currentIndex = tabList.indexOf(event.currentTarget);
+  let nextIndex = -1;
+
+  if (event.key === "ArrowRight") {
+    nextIndex = (currentIndex + 1) % tabList.length;
+  } else if (event.key === "ArrowLeft") {
+    nextIndex = (currentIndex - 1 + tabList.length) % tabList.length;
+  } else if (event.key === "Home") {
+    nextIndex = 0;
+  } else if (event.key === "End") {
+    nextIndex = tabList.length - 1;
+  }
+
+  if (nextIndex === -1) return;
+
+  event.preventDefault();
+  resetTabsAndPanels();
+  activateTab(tabList[nextIndex]);
+  tabList[nextIndex].focus();
+}
+
 // 14. 이벤트와 함수를 연결합니다.
 themeButton.addEventListener("click", handleThemeClick);
 
 tabs.forEach(function (tab) {
   tab.addEventListener("click", handleTabClick);
+  tab.addEventListener("keydown", handleTabKeydown);
 });
 
 // ---------- 7주차: 단계별 제보 흐름 ----------
@@ -272,7 +315,7 @@ function showFlowProblems(section, problems) {
   });
 
   section.querySelector(".step-error").textContent =
-    "확인이 필요한 항목이 " + problems.length + "개 있어요. 빨간 안내를 보고 고친 뒤 다시 눌러 주세요.";
+    "확인이 필요한 항목이 " + problems.length + "개 있어요. 아래 오류 안내를 보고 고친 뒤 다시 눌러 주세요.";
 
   const firstField = problems[0].field;
   const focusTarget = firstField.tagName === "FIELDSET" ? firstField.querySelector("input") : firstField;
@@ -432,7 +475,9 @@ function handleFlowSubmit(event) {
   }
 
   isFlowSubmitting = true;
+  flowForm.setAttribute("aria-busy", "true");
   flowSubmit.disabled = true;
+  flowSubmit.setAttribute("aria-busy", "true");
   flowSubmit.textContent = "제출 중...";
   flowSubmitStatus.classList.remove("is-error");
   flowSubmitStatus.classList.add("is-pending");
@@ -444,7 +489,9 @@ function handleFlowSubmit(event) {
 // 29. 제출 결과를 가짜로 흉내 냅니다(서버가 없어 5번 중 1번은 접수 실패로 처리합니다). 실패하면 입력값을 그대로 두고 다시 제출할 수 있습니다.
 function finishFlowSubmit() {
   isFlowSubmitting = false;
+  flowForm.setAttribute("aria-busy", "false");
   flowSubmit.disabled = false;
+  flowSubmit.setAttribute("aria-busy", "false");
   flowSubmit.textContent = "제보 완료하기";
 
   const didFail = Math.random() < 0.2;
@@ -502,7 +549,9 @@ function handleFlowRestart() {
   flowDoneSummary.textContent = "";
   flowDoneMessage.textContent = "";
   isFlowSubmitting = false;
+  flowForm.setAttribute("aria-busy", "false");
   flowSubmit.disabled = false;
+  flowSubmit.setAttribute("aria-busy", "false");
   flowSubmit.textContent = "제보 완료하기";
   flowSubmitStatus.textContent = "";
   flowSubmitStatus.classList.remove("is-pending", "is-error");
@@ -551,15 +600,22 @@ function handleFlowFieldChange(event) {
   }
 }
 
-// 물건 특징은 글자 수와 함께, 필수 조건을 채웠는지도 색·문구로 보여 줍니다.
+// 물건 특징은 글자 수와 함께, 필수 조건 충족과 한도 근접 여부를 색·문구로 함께 보여 줍니다.
 function handleFlowItemInput() {
   const currentLength = flowItem.value.length;
   const meetsCondition = flowItem.value.trim().length > 0;
+  const nearLimit = currentLength >= itemInfoWarningLength;
+  let countText = currentLength + " / " + itemInfoLimit;
 
-  flowItemCount.textContent = meetsCondition
-    ? currentLength + " / " + itemInfoLimit + " · 입력 조건을 충족했습니다."
-    : currentLength + " / " + itemInfoLimit;
-  flowItemCount.classList.toggle("is-near-limit", currentLength >= itemInfoWarningLength);
+  if (meetsCondition) {
+    countText = countText + " · 입력 조건을 충족했습니다.";
+  }
+  if (nearLimit) {
+    countText = countText + " · 글자 수 한도에 가까워요";
+  }
+
+  flowItemCount.textContent = countText;
+  flowItemCount.classList.toggle("is-near-limit", nearLimit);
   flowItem.closest(".flow-field").classList.toggle("is-valid", meetsCondition);
 }
 
@@ -595,7 +651,7 @@ let myReports = [];
 
 const myReportsEmpty = document.querySelector("#myReportsEmpty");
 const myReportsList = document.querySelector("#myReportsList");
-const myReportsCount = document.querySelector("#myReportsCount");
+const myReportsStatus = document.querySelector("#myReportsStatus");
 const filterButtons = document.querySelectorAll(".filter-button");
 
 // 10주차: all은 전체, active는 취소하지 않은 제보, cancelled는 취소한 제보입니다.
@@ -629,6 +685,7 @@ function createReportCard(report) {
     { label: "상세 장소", value: report.place === "" ? "입력하지 않음" : report.place }
   ];
 
+  detail.id = "report-detail-" + report.id;
   detail.className = "summary-list report-detail";
   detail.hidden = true;
   if (report.type === "found") {
@@ -653,6 +710,9 @@ function createReportCard(report) {
   toggleButton.type = "button";
   toggleButton.className = "text-button report-toggle";
   toggleButton.textContent = "자세히 보기";
+  toggleButton.setAttribute("aria-expanded", "false");
+  toggleButton.setAttribute("aria-controls", detail.id);
+  toggleButton.setAttribute("aria-label", report.id + " 제보 자세히 보기");
   actions.append(toggleButton);
 
   if (report.status === "active") {
@@ -661,6 +721,7 @@ function createReportCard(report) {
     cancelButton.type = "button";
     cancelButton.className = "secondary-button report-cancel";
     cancelButton.textContent = "찾았어요 (제보 취소)";
+    cancelButton.setAttribute("aria-label", report.id + " 찾았어요 (제보 취소)");
     actions.append(cancelButton);
   } else {
     const cancelledNote = document.createElement("p");
@@ -706,14 +767,18 @@ function renderMyReportsList() {
     emptyDescription.textContent = filtered
       ? "다른 상태를 선택해 보세요."
       : "‘단계별 제보’를 완료하면 여기에서 다시 보거나, 물건을 찾았을 때 취소할 수 있어요.";
-    emptyAction.hidden = filtered;
+    emptyAction.hidden = false;
+    emptyAction.textContent = filtered ? "전체 보기" : "제보하러 가기";
+    emptyAction.href = filtered ? "#myReports" : "#flow";
   }
 
-  myReportsCount.textContent = String(visibleReports.length);
-  myReportsCount.setAttribute(
-    "aria-label",
-    `현재 표시 중인 제보 ${visibleReports.length}건`
-  );
+  const selectedFilter = document.querySelector('.filter-button[aria-pressed="true"]');
+  const filterName = selectedFilter ? selectedFilter.textContent.trim() : "전체";
+  myReportsStatus.textContent = visibleReports.length > 0
+    ? `${filterName} 제보 ${visibleReports.length}건이 표시됩니다.`
+    : myReports.length > 0
+      ? `${filterName} 제보가 없습니다. 다른 상태를 선택해 보세요.`
+      : `${filterName} 제보가 없습니다.`;
 
   visibleReports.forEach((report) => {
     myReportsList.append(createReportCard(report));
@@ -732,7 +797,24 @@ filterButtons.forEach((button) => {
     });
 
     renderMyReportsList();
+
+    const count = getVisibleReports().length;
+    const filterName = button.textContent.trim();
+    myReportsStatus.textContent = count > 0
+      ? `${filterName} 제보 ${count}건이 표시됩니다.`
+      : myReports.length > 0
+        ? `${filterName} 제보가 없습니다. 다른 상태를 선택해 보세요.`
+        : `${filterName} 제보가 없습니다.`;
   });
+});
+
+// 11주차: 필터 결과가 비어 있을 때 '전체 보기'를 누르면 전체 필터로 돌아가고 초점도 맞춥니다.
+myReportsEmpty.querySelector("a").addEventListener("click", (event) => {
+  if (currentFilter === "all" || myReports.length === 0) return;
+  event.preventDefault();
+  const allButton = document.querySelector('[data-filter="all"]');
+  allButton.click();
+  allButton.focus();
 });
 
 // 36. 카드의 '자세히 보기'는 상세 내용을 펼치고 접습니다. '찾았어요'는 그 제보만 취소 상태로 바꿉니다.
@@ -740,10 +822,15 @@ function handleMyReportsListClick(event) {
   const toggleButton = event.target.closest(".report-toggle");
 
   if (toggleButton !== null) {
-    const detail = toggleButton.closest(".report-card").querySelector(".report-detail");
+    const card = toggleButton.closest(".report-card");
+    const detail = card.querySelector(".report-detail");
+    const reportId = card.dataset.reportId;
 
     detail.hidden = !detail.hidden;
-    toggleButton.textContent = detail.hidden ? "자세히 보기" : "접기";
+    const isExpanded = !detail.hidden;
+    toggleButton.textContent = isExpanded ? "접기" : "자세히 보기";
+    toggleButton.setAttribute("aria-expanded", String(isExpanded));
+    toggleButton.setAttribute("aria-label", reportId + (isExpanded ? " 제보 접기" : " 제보 자세히 보기"));
     return;
   }
 
@@ -757,6 +844,14 @@ function handleMyReportsListClick(event) {
 
     report.status = "cancelled";
     renderMyReportsList();
+
+    const nextButton = myReportsList.querySelector(
+      `[data-report-id="${reportId}"] .report-toggle`
+    );
+    const selectedFilter = document.querySelector(
+      '.filter-button[aria-pressed="true"]'
+    );
+    (nextButton || selectedFilter)?.focus();
   }
 }
 

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>캠퍼스 분실물 | 서비스 소개</title>
+  <title>서비스 소개 | 캠퍼스 분실물</title>
   <meta name="description" content="교내에서 잃어버리거나 주운 물건을 단계별로 제보하고, 내 제보 목록에서 다시 보거나 취소할 수 있는 캠퍼스 분실물 서비스입니다.">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -18,6 +18,8 @@
   정보 순서: 서비스 소개 → 주요 기능 → 이용 방법 → 단계별 제보 → 내 제보 목록
   주요 메뉴: 서비스 소개(#about) → 단계별 제보(#flow) → 내 제보 목록(#myReports)
   -->
+
+  <a class="skip-link" href="#top">본문 바로가기</a>
 
   <header class="site-header">
     <div class="header-inner">
@@ -38,7 +40,7 @@
     </div>
   </header>
 
-  <main>
+  <main id="top" tabindex="-1">
     <div class="hero">
       <h1>캠퍼스 분실물</h1>
       <p class="header-description">교내에서 잃어버린 물건과 주운 물건을 한곳에서 올리고 찾아갑니다.</p>
@@ -56,7 +58,7 @@
           <img
             class="service-image"
             src="./assets/images/service.jpg"
-            alt="대학교 분실물 보관소 창구에서 학생이 습득물을 문의하는 장면"
+            alt="밝은 대학 학생회관 분실물 보관소 안내 데스크에서 학생이 직원과 무선 이어폰 케이스와 텀블러를 주고받고 있으며, 뒤쪽 원목 선반에 우산과 수납 바구니 등 습득물이 정리된 장면"
           >
         </div>
       </div>
@@ -211,7 +213,7 @@
 
             <div class="flow-field" id="flowKeepField" hidden>
               <label for="flowKeep">지금 물건을 맡겨 둔 곳 <span class="required">(필수)</span></label>
-              <select id="flowKeep" name="flowKeep" aria-describedby="flowKeepHelp flowKeepError">
+              <select id="flowKeep" name="flowKeep" aria-describedby="flowKeepHelp flowKeepError" disabled>
                 <option value="">보관 장소를 골라 주세요</option>
                 <option value="내가 가지고 있어요">내가 가지고 있어요</option>
                 <option value="학생회관 분실물 보관함">학생회관 분실물 보관함</option>
@@ -272,7 +274,7 @@
       </div>
 
       <p class="reports-status" id="myReportsStatus" role="status" aria-live="polite">
-        표시 중인 제보 <strong id="myReportsCount">0</strong>건
+        전체 제보가 없습니다.
       </p>
 
       <div class="my-reports-empty" id="myReportsEmpty">
